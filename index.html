@@ -99,6 +99,7 @@ select:focus{border-color:#7c6af7}
 .post-btns{display:flex;gap:6px}
 .btn-sm{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #2a2a3d;background:#1e1e2e;color:#e8e8f0;transition:all .2s;font-family:'Inter',sans-serif}
 .btn-sm:hover{border-color:#7c6af7;color:#7c6af7}
+.btn-del-post:hover{border-color:#f76a8a !important;color:#f76a8a !important}
 .post-body{padding:14px}
 .post-content{background:#1e1e2e;border:1px solid #2a2a3d;border-radius:8px;padding:12px;font-size:13px;line-height:1.7;color:#e8e8f0;white-space:pre-wrap;min-height:70px;outline:none;transition:border-color .2s}
 .post-content:focus{border-color:#7c6af7}
@@ -501,6 +502,7 @@ function renderResults(posts, platforms, count) {
           <div class="post-btns">
             <button class="btn-sm" onclick="copyPost('${uid}')">Copy</button>
             <button class="btn-sm" onclick="redoPost('${platform}','${uid}')">↻ Redo</button>
+            <button class="btn-sm btn-del-post" onclick="deletePost('${uid}')" title="Delete">🗑</button>
           </div>
         </div>
         <div class="post-body">
@@ -532,6 +534,21 @@ function copyPost(uid) {
   const el = document.getElementById('pc_' + uid);
   if (!el) return;
   navigator.clipboard.writeText(el.innerText).then(() => toast('✓ Copied!'));
+}
+
+// ════════════════════════════════
+// DELETE POST CARD
+// ════════════════════════════════
+function deletePost(uid) {
+  const el = document.getElementById('pc_' + uid);
+  if (!el) return;
+  const card = el.closest('.post-card');
+  if (card) {
+    card.style.transition = 'opacity .2s, transform .2s';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.97)';
+    setTimeout(() => card.remove(), 200);
+  }
 }
 
 // ════════════════════════════════
