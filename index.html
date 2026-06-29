@@ -756,17 +756,17 @@
         <div>
           <label class="field-label">Posts per Platform</label>
           <select id="post-count">
-            <option value="1" selected>1 post</option>
-            <option value="2">2 posts</option>
-            <option value="3">3 posts</option>
+            <option value="10" selected>10 posts</option>
+            <option value="20">20 posts</option>
+            <option value="30">30 posts</option>
           </select>
         </div>
       </div>
     </div>
 
-    <!-- WORKER CONFIG -->
-    <div class="config-notice">
-      🔧 <strong>Setup required:</strong> Open this file and replace <strong>YOUR_WORKER_URL_HERE</strong> with your Cloudflare Worker URL (e.g. <code>https://falling-block-5000.rawais086.workers.dev/</code>). Your Groq API key stays hidden in the Worker — safe and free.
+    <!-- WORKER CONFIG — hidden, URL already set -->
+    <div class="config-notice" id="config-notice" style="display:none;">
+      🔧 <strong>Setup required:</strong> Open this file and replace <strong>YOUR_WORKER_URL_HERE</strong> with your Cloudflare Worker URL. Your Groq API key stays hidden in the Worker — safe and free.
     </div>
 
     <!-- GENERATE BUTTON -->
@@ -808,7 +808,7 @@
 
 <script>
 // ── CONFIG ──
-const WORKER_URL = 'YOUR_WORKER_URL_HERE'; // Replace with your Cloudflare Worker URL
+const WORKER_URL = 'https://dawn-heart-e579.rawais086.workers.dev/'; // Your Cloudflare Worker URL
 
 // ── STATE ──
 let scheduledPosts = JSON.parse(localStorage.getItem('pc_scheduled') || '[]');
@@ -951,7 +951,6 @@ async function generatePosts() {
 
   if (!input) { showToast('⚠️ Please add some content first'); return; }
   if (!platforms.length) { showToast('⚠️ Select at least one platform'); return; }
-  if (WORKER_URL === 'https://dawn-heart-e579.rawais086.workers.dev/') { showToast('⚠️ Set your Worker URL in the code'); return; }
 
   setLoading(true);
 
@@ -966,14 +965,13 @@ async function generatePosts() {
 
   // Build JSON structure for multiple posts
   const jsonStructure = platforms.map(p => {
-    if (postCount === 1) return `"${p}": ["post 1 here"]`;
-    if (postCount === 2) return `"${p}": ["post 1 here", "post 2 here (different angle)"]`;
-    return `"${p}": ["post 1 here", "post 2 here (different angle)", "post 3 here (different angle)"]`;
+    const placeholders = Array.from({length: postCount}, (_, i) => `"post ${i+1} here — unique angle"`).join(', ');
+    return `"${p}": [${placeholders}]`;
   }).join(',\n    ');
 
   const systemPrompt = `You are PostCraft AI, a social media content expert. Create platform-optimized posts in ${lang} language with a ${tone} tone.
 
-Generate ${postCount} post(s) per platform. Each post must be DIFFERENT — different hook, different angle, different style.
+Generate exactly ${postCount} posts per platform. Each post MUST be completely different — different hook, different angle, different opening line, different style. No repetition.
 
 Return ONLY valid JSON in this exact format, no extra text:
 {
@@ -988,7 +986,7 @@ ${selectedInstructions}
 IMPORTANT: 
 - Write in ${lang}
 - Tone: ${tone}
-- ${postCount > 1 ? `Make each of the ${postCount} posts feel completely different from each other` : 'Make the post engaging and on-brand'}
+- Generate exactly ${postCount} posts per platform, all unique
 - Return ONLY the JSON, no markdown, no explanation`;
 - Return ONLY the JSON, no markdown, no explanation`;
 
@@ -1020,7 +1018,7 @@ IMPORTANT:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 2000,
+        max_tokens: 8000,
         messages
       })
     });
