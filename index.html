@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PostCraft — AI Social Media Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0e0e14;
+    --surface: #16161f;
+    --surface2: #1e1e2e;
+    --border: #2a2a3d;
+    --accent: #7c6af7;
+    --accent2: #f76a8a;
+    --accent3: #6af7c8;
+    --text: #e8e8f0;
+    --text-muted: #8888aa;
+    --fb: #1877f2;
+    --ig: #e1306c;
+    --li: #0a66c2;
+    --yt: #ff0000;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo span {
+    font-weight: 400;
+    opacity: 0.6;
+    font-size: 13px;
+    display: block;
+    -webkit-text-fill-color: var(--text-muted);
+    background: none;
+    margin-top: -2px;
+  }
+
+  .badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: linear-gradient(var(--accent), var(--accent2));
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: var(--surface2);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── INPUTS ── */
+  textarea, input[type="text"], input[type="url"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus, input:focus {
+    border-color: var(--accent);
+  }
+
+  textarea { min-height: 120px; }
+
+  input[type="file"] { display: none; }
+
+  .file-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 32px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .file-label:hover {
+    border-color: var(--accent);
+    background: rgba(124,106,247,0.05);
+  }
+
+  .file-label .icon { font-size: 32px; }
+
+  /* ── PLATFORM CHECKBOXES ── */
+  .platforms {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  @media (min-width: 480px) {
+    .platforms { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .platform-check {
+    display: none;
+  }
+
+  .platform-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 10px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .platform-label .p-icon { font-size: 24px; }
+
+  .platform-check:checked + .platform-label {
+    color: white;
+    background: rgba(124,106,247,0.12);
+  }
+
+  .platform-check[value="facebook"]:checked + .platform-label { border-color: var(--fb); background: rgba(24,119,242,0.12); color: #5ba3f5; }
+  .platform-check[value="instagram"]:checked + .platform-label { border-color: var(--ig); background: rgba(225,48,108,0.12); color: #f76a8a; }
+  .platform-check[value="linkedin"]:checked + .platform-label { border-color: var(--li); background: rgba(10,102,194,0.12); color: #5ba3f5; }
+  .platform-check[value="youtube"]:checked + .platform-label { border-color: var(--yt); background: rgba(255,0,0,0.10); color: #ff6b6b; }
+
+  /* ── LANGUAGE + TONE ── */
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  label.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  /* ── GENERATE BUTTON ── */
+  .btn-generate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-generate:hover { opacity: 0.9; }
+  .btn-generate:active { transform: scale(0.99); }
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── LOADING ── */
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+
+  .results-grid {
+    display: grid;
+    gap: 20px;
+  }
+
+  .post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-platform {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .post-platform .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-fb { background: var(--fb); }
+  .dot-ig { background: var(--ig); }
+  .dot-li { background: var(--li); }
+  .dot-yt { background: var(--yt); }
+
+  .post-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.copied { background: var(--accent3); color: #0e0e14; border-color: var(--accent3); }
+
+  .post-body {
+    padding: 18px;
+  }
+
+  .post-content {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    min-height: 80px;
+    border: 1px solid var(--border);
+  }
+
+  .post-content:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  /* Character count */
+  .char-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  /* ── SCHEDULE SECTION ── */
+  .schedule-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .schedule-row label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  input[type="datetime-local"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    flex: 1;
+    min-width: 180px;
+    transition: border-color 0.2s;
+    color-scheme: dark;
+  }
+
+  input[type="datetime-local"]:focus { border-color: var(--accent); }
+
+  .btn-schedule {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: var(--accent);
+    color: white;
+    transition: opacity 0.2s;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+  }
+
+  .btn-schedule:hover { opacity: 0.85; }
+
+  /* ── SCHEDULED LIST ── */
+  #schedule-panel {
+    display: none;
+  }
+
+  .scheduled-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .scheduled-item .si-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .si-platform {
+    font-size: 20px;
+  }
+
+  .si-info { flex: 1; }
+  .si-info .si-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .si-info .si-preview {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+  }
+
+  .si-status {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .si-status.pending { background: rgba(124,106,247,0.15); color: var(--accent); }
+  .si-status.posted { background: rgba(106,247,200,0.15); color: var(--accent3); }
+
+  .btn-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .btn-remove:hover { color: var(--accent2); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 12px 22px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── SECTION NAV ── */
+  .section-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px;
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .nav-btn.active {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── WORKER CONFIG ── */
+  .config-notice {
+    background: rgba(124,106,247,0.08);
+    border: 1px solid rgba(124,106,247,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .config-notice strong { color: var(--accent); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    PostCraft ✦
+    <span>by Awais Rashid</span>
+  </div>
+  <div class="badge">AI POWERED</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Turn any content into<br><span class="gradient">platform-ready posts</span></h1>
+    <p>Paste text, drop a URL, or upload a file. AI writes the posts. You pick where they go.</p>
+  </div>
+
+  <!-- SECTION NAV -->
+  <div class="section-nav">
+    <button class="nav-btn active" onclick="showSection('generate')">✦ Generate</button>
+    <button class="nav-btn" onclick="showSection('scheduled')">📅 Scheduled</button>
+  </div>
+
+  <!-- GENERATE SECTION -->
+  <div id="generate" class="section active">
+
+    <!-- INPUT CARD -->
+    <div class="card">
+      <div class="card-title">Your Content</div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('text', this)">✏️ Text</button>
+        <button class="tab" onclick="switchTab('url', this)">🔗 URL</button>
+        <button class="tab" onclick="switchTab('file', this)">📄 File</button>
+      </div>
+
+      <div id="tab-text" class="tab-panel active">
+        <textarea id="input-text" placeholder="Paste your blog post, article, announcement, or any text here..."></textarea>
+      </div>
+
+      <div id="tab-url" class="tab-panel">
+        <input type="url" id="input-url" placeholder="https://article.com  or  https://youtube.com/watch?v=..." />
+        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+          🎬 Paste a <strong>YouTube or video URL</strong> — AI will generate posts based on the video topic.<br>
+          📰 Paste any <strong>article or blog URL</strong> — AI creates posts from the content.<br>
+          <span style="opacity:0.6;">Note: Direct URL fetching requires Worker setup. AI uses the URL context intelligently.</span>
+        </div>
+      </div>
+
+      <div id="tab-file" class="tab-panel">
+        <label class="file-label" for="input-file" id="file-drop-label">
+          <span class="icon">📂</span>
+          <span><strong>Click to upload</strong> or drag & drop</span>
+          <span style="font-size:12px; color:var(--text-muted);">TXT · DOCX · PDF</span>
+        </label>
+        <input type="file" id="input-file" accept=".txt,.docx,.pdf" onchange="handleFile(this)"/>
+        <div id="file-name" style="font-size:13px; color:var(--accent); margin-top:8px; display:none;"></div>
+      </div>
+    </div>
+
+    <!-- PLATFORMS CARD -->
+    <div class="card">
+      <div class="card-title">Post To</div>
+      <div class="platforms">
+        <div>
+          <input type="checkbox" class="platform-check" id="p-fb" value="facebook" checked>
+          <label class="platform-label" for="p-fb">
+            <span class="p-icon">📘</span> Facebook
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" class="platform-check" id="p-ig" value="instagram" checked>
+          <label class="platform-label" for="p-ig">
+            <span class="p-icon">📸</span> Instagram
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" class="platform-check" id="p-li" value="linkedin">
+          <label class="platform-label" for="p-li">
+            <span class="p-icon">💼</span> LinkedIn
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" class="platform-check" id="p-yt" value="youtube">
+          <label class="platform-label" for="p-yt">
+            <span class="p-icon">▶️</span> YouTube
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTIONS CARD -->
+    <div class="card">
+      <div class="card-title">Options</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+        <div>
+          <label class="field-label">Language</label>
+          <select id="lang">
+            <option value="English">🇬🇧 English</option>
+            <option value="Urdu">🇵🇰 Urdu</option>
+            <option value="Arabic">🇸🇦 Arabic</option>
+            <option value="German">🇩🇪 German</option>
+            <option value="French">🇫🇷 French</option>
+            <option value="Spanish">🇪🇸 Spanish</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Tone</label>
+          <select id="tone">
+            <option value="Professional">Professional</option>
+            <option value="Casual & Friendly" selected>Casual & Friendly</option>
+            <option value="Motivational">Motivational</option>
+            <option value="Educational">Educational</option>
+            <option value="Humorous">Humorous</option>
+            <option value="Promotional">Promotional</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Posts per Platform</label>
+          <select id="post-count">
+            <option value="1" selected>1 post</option>
+            <option value="2">2 posts</option>
+            <option value="3">3 posts</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKER CONFIG -->
+    <div class="config-notice">
+      🔧 <strong>Setup required:</strong> Open this file and replace <strong>YOUR_WORKER_URL_HERE</strong> with your Cloudflare Worker URL (e.g. <code>https://falling-block-5000.rawais086.workers.dev/</code>). Your Groq API key stays hidden in the Worker — safe and free.
+    </div>
+
+    <!-- GENERATE BUTTON -->
+    <button class="btn-generate" id="gen-btn" onclick="generatePosts()">
+      <div class="spinner" id="spinner"></div>
+      <span id="btn-text">✦ Generate Posts</span>
+    </button>
+
+    <!-- RESULTS -->
+    <div id="results" style="margin-top:28px;">
+      <div class="card-title" style="margin-bottom:16px;">Generated Posts</div>
+      <div class="results-grid" id="results-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- SCHEDULED SECTION -->
+  <div id="scheduled" class="section">
+    <div class="card">
+      <div class="card-title">Scheduled Posts</div>
+      <div id="schedule-list">
+        <div class="empty-state">
+          <div class="es-icon">📅</div>
+          <p>No posts scheduled yet.<br>Generate posts and click "Schedule" to add them here.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-notice">
+      ⚡ <strong>Auto-publish note:</strong> True auto-publishing requires connecting Facebook, LinkedIn, and YouTube APIs. For now, PostCraft saves your scheduled posts locally and reminds you when it's time to post. API publishing setup guide is in the README.
+    </div>
+  </div>
+
+</main>
+
+<footer>Built with ❤️ by Awais Rashid &nbsp;·&nbsp; PostCraft © 2026</footer>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const WORKER_URL = 'YOUR_WORKER_URL_HERE'; // Replace with your Cloudflare Worker URL
+
+// ── STATE ──
+let scheduledPosts = JSON.parse(localStorage.getItem('pc_scheduled') || '[]');
+let fileContent = '';
+let fileType = ''; // 'text' | 'image'
+let activeTab = 'text';
+
+// ── LOAD SCRIPT HELPER ──
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ── SECTION NAV ──
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'scheduled') renderScheduled();
+}
+
+// ── TABS ──
+function switchTab(tab, btn) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── FILE HANDLER ──
+async function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const nameEl = document.getElementById('file-name');
+  const previewEl = document.getElementById('file-preview');
+  const imgEl = document.getElementById('img-preview');
+  previewEl.style.display = 'none';
+  nameEl.style.display = 'block';
+  nameEl.textContent = '⏳ Reading ' + file.name + '...';
+  fileContent = '';
+  fileType = '';
+
+  const ext = file.name.split('.').pop().toLowerCase();
+
+  // ── TXT ──
+  if (ext === 'txt') {
+    const reader = new FileReader();
+    reader.onload = e => {
+      fileContent = e.target.result;
+      fileType = 'text';
+      nameEl.textContent = '✓ ' + file.name + ' loaded (' + fileContent.length + ' chars)';
+    };
+    reader.readAsText(file);
+
+  // ── DOCX ──
+  } else if (ext === 'docx') {
+    if (typeof mammoth === 'undefined') {
+      nameEl.textContent = '⏳ Loading DOCX reader...';
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    fileContent = result.value;
+    fileType = 'text';
+    nameEl.textContent = '✓ ' + file.name + ' loaded (' + fileContent.length + ' chars)';
+
+  // ── PDF ──
+  } else if (ext === 'pdf') {
+    if (typeof pdfjsLib === 'undefined') {
+      nameEl.textContent = '⏳ Loading PDF reader...';
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(s => s.str).join(' ') + '\n';
+    }
+    fileContent = text.trim();
+    fileType = 'text';
+    nameEl.textContent = '✓ ' + file.name + ' loaded (' + pdf.numPages + ' pages)';
+
+  } else {
+    nameEl.textContent = '❌ Unsupported file type. Use TXT, DOCX, or PDF.';
+  }
+}
+
+// ── GET INPUT ──
+function getInput() {
+  if (activeTab === 'text') return document.getElementById('input-text').value.trim();
+  if (activeTab === 'url') return document.getElementById('input-url').value.trim();
+  if (activeTab === 'file') return fileContent;
+  return '';
+}
+
+// ── DETECT VIDEO URL ──
+function isVideoUrl(url) {
+  return /youtube\.com|youtu\.be|tiktok\.com|vimeo\.com|dailymotion\.com|twitch\.tv/i.test(url);
+}
+
+function getVideoContext(url) {
+  if (/youtube\.com|youtu\.be/i.test(url)) return 'YouTube video';
+  if (/tiktok\.com/i.test(url)) return 'TikTok video';
+  if (/vimeo\.com/i.test(url)) return 'Vimeo video';
+  if (/twitch\.tv/i.test(url)) return 'Twitch stream';
+  return 'video';
+}
+
+// ── GET SELECTED PLATFORMS ──
+function getSelectedPlatforms() {
+  return [...document.querySelectorAll('.platform-check:checked')].map(c => c.value);
+}
+
+// ── PLATFORM DISPLAY INFO ──
+const platformInfo = {
+  facebook:  { name: 'Facebook',  icon: '📘', dot: 'dot-fb', emoji: '📘' },
+  instagram: { name: 'Instagram', icon: '📸', dot: 'dot-ig', emoji: '📸' },
+  linkedin:  { name: 'LinkedIn',  icon: '💼', dot: 'dot-li', emoji: '💼' },
+  youtube:   { name: 'YouTube',   icon: '▶️', dot: 'dot-yt', emoji: '▶️' },
+};
+
+// ── GENERATE POSTS ──
+async function generatePosts() {
+  const input = getInput();
+  const platforms = getSelectedPlatforms();
+  const lang = document.getElementById('lang').value;
+  const tone = document.getElementById('tone').value;
+  const postCount = parseInt(document.getElementById('post-count').value);
+
+  if (!input) { showToast('⚠️ Please add some content first'); return; }
+  if (!platforms.length) { showToast('⚠️ Select at least one platform'); return; }
+  if (WORKER_URL === 'https://dawn-heart-e579.rawais086.workers.dev/') { showToast('⚠️ Set your Worker URL in the code'); return; }
+
+  setLoading(true);
+
+  const platformPrompts = {
+    facebook: `FACEBOOK POST: Conversational, 150-300 words, 2-4 relevant emojis, 3-5 hashtags at end. Hook first line. Encourage engagement with a question.`,
+    instagram: `INSTAGRAM CAPTION: Punchy opening line, 100-200 words, heavy emojis throughout, 15-20 hashtags grouped at end. Visually scannable.`,
+    linkedin: `LINKEDIN POST: Professional but human, 150-300 words, story-driven format, 3-5 hashtags. No more than 2 emojis. End with an insight or call-to-action.`,
+    youtube: `YOUTUBE DESCRIPTION: Include: Title suggestion, Description (200-300 words, SEO-friendly), 10 relevant tags separated by commas. Format clearly with labels.`,
+  };
+
+  const selectedInstructions = platforms.map(p => platformPrompts[p]).join('\n\n');
+
+  // Build JSON structure for multiple posts
+  const jsonStructure = platforms.map(p => {
+    if (postCount === 1) return `"${p}": ["post 1 here"]`;
+    if (postCount === 2) return `"${p}": ["post 1 here", "post 2 here (different angle)"]`;
+    return `"${p}": ["post 1 here", "post 2 here (different angle)", "post 3 here (different angle)"]`;
+  }).join(',\n    ');
+
+  const systemPrompt = `You are PostCraft AI, a social media content expert. Create platform-optimized posts in ${lang} language with a ${tone} tone.
+
+Generate ${postCount} post(s) per platform. Each post must be DIFFERENT — different hook, different angle, different style.
+
+Return ONLY valid JSON in this exact format, no extra text:
+{
+  "posts": {
+    ${jsonStructure}
+  }
+}
+
+Platform requirements:
+${selectedInstructions}
+
+IMPORTANT: 
+- Write in ${lang}
+- Tone: ${tone}
+- ${postCount > 1 ? `Make each of the ${postCount} posts feel completely different from each other` : 'Make the post engaging and on-brand'}
+- Return ONLY the JSON, no markdown, no explanation`;
+- Return ONLY the JSON, no markdown, no explanation`;
+
+  // Build request based on input type
+  let messages;
+
+  {
+    let userPrompt;
+    if (activeTab === 'url') {
+      if (isVideoUrl(input)) {
+        const videoType = getVideoContext(input);
+        userPrompt = `Create social media posts for this ${videoType}: ${input}\n\nAnalyze the URL to understand the topic, channel, or content. Generate engaging posts promoting or discussing this video content. If it's a YouTube video, suggest good captions, descriptions and hashtags. Be creative based on what the URL suggests about the content.`;
+      } else {
+        userPrompt = `Create posts based on content from this URL: ${input}\nAnalyze the URL to understand the topic and create highly relevant posts. Infer the subject matter from the domain and path.`;
+      }
+    } else {
+      userPrompt = `Create posts from this content:\n\n${input.substring(0, 3000)}`;
+    }
+
+    messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ];
+  }
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 2000,
+        messages
+      })
+    });
+
+    const data = await response.json();
+    let text = data.choices?.[0]?.message?.content || '';
+
+    // Clean JSON
+    text = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(text);
+    renderResults(parsed.posts, platforms);
+
+  } catch (err) {
+    console.error(err);
+    showToast('❌ Error generating posts. Check your Worker URL.');
+  }
+
+  setLoading(false);
+}
+
+// ── RENDER RESULTS ──
+function renderResults(posts, platforms) {
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = '';
+
+  platforms.forEach(platform => {
+    const info = platformInfo[platform];
+    // posts[platform] is now always an array
+    let postsArray = posts[platform];
+    if (!Array.isArray(postsArray)) postsArray = [postsArray || 'Could not generate this post.'];
+
+    postsArray.forEach((content, idx) => {
+      const uid = `${platform}-${idx}`;
+      const label = postsArray.length > 1 ? ` — Version ${idx + 1}` : '';
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.innerHTML = `
+        <div class="post-header">
+          <div class="post-platform">
+            <div class="dot ${info.dot}"></div>
+            ${info.icon} ${info.name}${label}
+          </div>
+          <div class="post-actions">
+            <button class="btn-sm" onclick="copyPost('${uid}')">Copy</button>
+            <button class="btn-sm" onclick="regeneratePost('${platform}', '${uid}')">↻ Redo</button>
+          </div>
+        </div>
+        <div class="post-body">
+          <div class="post-content" id="post-${uid}" contenteditable="true">${escapeHtml(content)}</div>
+          <div class="char-count" id="cc-${uid}">${content.length} chars</div>
+          <div class="schedule-row">
+            <label>Schedule for:</label>
+            <input type="datetime-local" id="dt-${uid}" />
+            <button class="btn-schedule" onclick="schedulePost('${platform}', '${uid}')">+ Schedule</button>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+
+      setTimeout(() => {
+        const el = document.getElementById('post-' + uid);
+        const cc = document.getElementById('cc-' + uid);
+        if (el && cc) el.addEventListener('input', () => { cc.textContent = el.innerText.length + ' chars'; });
+      }, 100);
+    });
+  });
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── COPY ──
+function copyPost(uid) {
+  const el = document.getElementById('post-' + uid);
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ Copied to clipboard!');
+  });
+}
+
+// ── REGENERATE (single post) ──
+async function regeneratePost(platform, uid) {
+  const input = getInput();
+  const lang = document.getElementById('lang').value;
+  const tone = document.getElementById('tone').value;
+
+  if (!input) { showToast('⚠️ No content to regenerate from'); return; }
+
+  const el = document.getElementById('post-' + uid);
+  el.innerText = 'Regenerating...';
+
+  const platformPrompts = {
+    facebook: 'FACEBOOK POST: Conversational, 150-300 words, 2-4 emojis, 3-5 hashtags at end, engagement question.',
+    instagram: 'INSTAGRAM CAPTION: Punchy opener, 100-200 words, heavy emojis, 15-20 hashtags at end.',
+    linkedin: 'LINKEDIN POST: Professional, 150-300 words, story-driven, 3-5 hashtags, max 2 emojis.',
+    youtube: 'YOUTUBE DESCRIPTION: Title suggestion, 200-300 word SEO description, 10 tags.',
+  };
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 800,
+        messages: [
+          { role: 'system', content: `You are a social media expert. Write in ${lang} with ${tone} tone. Return ONLY the post text, nothing else.` },
+          { role: 'user', content: `Create a ${platform} post from: ${input.substring(0,2000)}\n\nRequirements: ${platformPrompts[platform]}` }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content?.trim() || 'Error regenerating.';
+    el.innerText = text;
+    document.getElementById('cc-' + uid).textContent = text.length + ' chars';
+
+  } catch (err) {
+    el.innerText = 'Error. Please try again.';
+  }
+}
+
+// ── SCHEDULE ──
+function schedulePost(platform, uid) {
+  const el = document.getElementById('post-' + uid);
+  const dt = document.getElementById('dt-' + uid);
+  const content = el.innerText.trim();
+  const dateTime = dt.value;
+
+  if (!content) { showToast('⚠️ Post is empty'); return; }
+  if (!dateTime) { showToast('⚠️ Pick a date & time'); return; }
+
+  const post = {
+    id: Date.now(),
+    platform,
+    content,
+    dateTime,
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  };
+
+  scheduledPosts.push(post);
+  saveScheduled();
+  showToast('📅 Scheduled for ' + formatDT(dateTime));
+  setReminder(post);
+}
+
+function setReminder(post) {
+  const now = new Date().getTime();
+  const target = new Date(post.dateTime).getTime();
+  const delay = target - now;
+  if (delay > 0 && delay < 86400000 * 7) { // within 7 days
+    setTimeout(() => {
+      showToast(`⏰ Time to post on ${platformInfo[post.platform]?.name}!`);
+    }, delay);
+  }
+}
+
+// ── RENDER SCHEDULED ──
+function renderScheduled() {
+  const list = document.getElementById('schedule-list');
+
+  if (!scheduledPosts.length) {
+    list.innerHTML = `<div class="empty-state"><div class="es-icon">📅</div><p>No posts scheduled yet.<br>Generate posts and click "Schedule" to add them here.</p></div>`;
+    return;
+  }
+
+  // Sort by dateTime
+  const sorted = [...scheduledPosts].sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+  list.innerHTML = sorted.map(post => {
+    const info = platformInfo[post.platform];
+    const isPast = new Date(post.dateTime) < new Date();
+    const preview = post.content.substring(0, 60) + (post.content.length > 60 ? '…' : '');
+    return `
+      <div class="scheduled-item">
+        <div class="si-left">
+          <div class="si-platform">${info?.icon || '📌'}</div>
+          <div class="si-info">
+            <div class="si-preview">${escapeHtml(preview)}</div>
+            <div class="si-time">📅 ${formatDT(post.dateTime)} · ${info?.name}</div>
+          </div>
+        </div>
+        <span class="si-status ${isPast ? 'posted' : 'pending'}">${isPast ? '✓ Due' : 'Scheduled'}</span>
+        <button class="btn-remove" onclick="removeScheduled(${post.id})" title="Remove">×</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function removeScheduled(id) {
+  scheduledPosts = scheduledPosts.filter(p => p.id !== id);
+  saveScheduled();
+  renderScheduled();
+  showToast('Removed');
+}
+
+function saveScheduled() {
+  localStorage.setItem('pc_scheduled', JSON.stringify(scheduledPosts));
+}
+
+// ── HELPERS ──
+function setLoading(on) {
+  const btn = document.getElementById('gen-btn');
+  const spinner = document.getElementById('spinner');
+  const text = document.getElementById('btn-text');
+  btn.disabled = on;
+  spinner.style.display = on ? 'block' : 'none';
+  text.textContent = on ? 'Generating...' : '✦ Generate Posts';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatDT(dt) {
+  return new Date(dt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──
+// Re-register reminders for upcoming posts on load
+scheduledPosts.forEach(post => {
+  if (new Date(post.dateTime) > new Date()) setReminder(post);
+});
+</script>
+</body>
+</html>
