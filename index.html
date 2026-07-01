@@ -33,6 +33,10 @@ main{max-width:860px;margin:0 auto;padding:28px 16px 80px}
 .section{display:none}
 .section.active{display:block}
 
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+
 /* CARD */
 .card{background:#16161f;border:1px solid #2a2a3d;border-radius:12px;padding:20px;margin-bottom:16px}
 .card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#8888aa;margin-bottom:14px;display:flex;align-items:center;gap:6px}
@@ -291,7 +295,7 @@ function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   if (id === 'scheduled') renderScheduled();
 }
 
@@ -633,17 +637,27 @@ function renderScheduled() {
   }
   const sorted = [...scheduled].sort((a,b) => new Date(a.dateTime) - new Date(b.dateTime));
   list.innerHTML = sorted.map(item => {
-    const info  = PLATFORM_INFO[item.platform];
+    const info   = PLATFORM_INFO[item.platform];
     const isPast = new Date(item.dateTime) < new Date();
     const preview = item.content.substring(0,60) + (item.content.length>60?'…':'');
-    return `<div class="sched-item">
-      <div class="si-icon">${info?.icon||'📌'}</div>
-      <div class="si-info">
-        <div class="si-preview">${esc(preview)}</div>
-        <div class="si-time">📅 ${fmtDT(item.dateTime)} · ${info?.name}</div>
+    return `<div class="sched-item" style="flex-direction:column;align-items:stretch">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="si-icon">${info?.icon||'📌'}</div>
+        <div class="si-info">
+          <div class="si-preview">${esc(preview)}</div>
+          <div class="si-time">📅 ${fmtDT(item.dateTime)} · ${info?.name}</div>
+        </div>
+        <span class="si-badge ${isPast?'due':'pending'}">${isPast?'Due':'Scheduled'}</span>
+        <div style="display:flex;gap:6px;margin-left:auto">
+          <button class="btn-sm" onclick="toggleExpand(${item.id})">👁 View</button>
+          <button class="btn-sm" onclick="copyScheduled(${item.id})">Copy</button>
+          <button class="btn-del" onclick="deleteScheduled(${item.id})" title="Remove">×</button>
+        </div>
       </div>
-      <span class="si-badge ${isPast?'due':'pending'}">${isPast?'Due':'Scheduled'}</span>
-      <button class="btn-del" onclick="deleteScheduled(${item.id})" title="Remove">×</button>
+      <div id="expand_${item.id}" style="display:none;margin-top:12px">
+        <div style="background:#0e0e14;border:1px solid #2a2a3d;border-radius:8px;padding:12px;font-size:13px;line-height:1.7;white-space:pre-wrap;color:#e8e8f0">${esc(item.content)}</div>
+        <button class="btn-sm" style="margin-top:8px;width:100%;justify-content:center;display:block;text-align:center" onclick="copyScheduled(${item.id})">📋 Copy Full Post</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -653,6 +667,18 @@ function deleteScheduled(id) {
   localStorage.setItem('pc_sched', JSON.stringify(scheduled));
   renderScheduled();
   toast('Removed');
+}
+
+function toggleExpand(id) {
+  const el = document.getElementById('expand_' + id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function copyScheduled(id) {
+  const item = scheduled.find(s => s.id === id);
+  if (!item) return;
+  navigator.clipboard.writeText(item.content).then(() => toast('✓ Copied!'));
 }
 
 // ════════════════════════════════
